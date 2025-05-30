@@ -1,8 +1,12 @@
 import React from 'react'
-
+import LoginPopup from './components/LoginPopup/LoginPopup'
 const App = () => {
   return (
-    <div>App</div>
+    <>
+     <div>App</div>
+     <LoginPopup/>
+     </>
+   
   )
 }
 
