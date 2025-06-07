@@ -1,12 +1,12 @@
 .navbar {
-    padding: 20px 0px;
+    padding: 10px 0px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .navbar .logo {
-    width: 150px;
+    width: 180px;
 }
 .navbar li{
     cursor:pointer;
@@ -56,7 +56,7 @@ position: relative;
 }
 
 .navbar-right button:hover {
-    background: #fff4f2;
+    background: #ede0dd;
 }
 
 .navbar-profile{
