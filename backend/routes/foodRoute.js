@@ -1,5 +1,5 @@
 // importing controllers for adding food
-import { addFood } from "../controllers/foodController.js";
+import { addFood, listFood, removeFood } from "../controllers/foodController.js";
 import express from "express";
 import multer from "multer";
 const foodRouter = express.Router();
@@ -8,12 +8,15 @@ const foodRouter = express.Router();
 const storage = multer.diskStorage({
   destination: "uploads",
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now());
+    cb(null, `${Date.now()}${file.originalname}`);
   },
 });
 
+
 const upload = multer({ storage: storage });
-//adding middlewares
+//upload middleware
 foodRouter.post("/add", upload.single("image"), addFood);
+foodRouter.get("/list", listFood);
+foodRouter.post("/remove", removeFood);
 
 export default foodRouter;
