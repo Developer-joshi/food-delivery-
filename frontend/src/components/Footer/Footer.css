@@ -23,6 +23,9 @@
   align-items: start;
   gap: 20px;
 }
+.footer-content-left img {
+  height: 5.5em;
+}
 .footer-content-left ul li,
 .footer-content-center ul li,
 .footer-content-right ul li {
