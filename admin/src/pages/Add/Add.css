@@ -15,7 +15,7 @@
     width: max(40%,280px);
 }
 .add-product-name input ,.add-product-description textarea{
-    padding: 10px 10px;
+    padding: 10px;
 }
 .add-category-price{
     display: flex;

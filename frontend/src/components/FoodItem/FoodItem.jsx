@@ -6,8 +6,8 @@ import { StoreContext } from '../../context/StoreContext';
 const FoodItem = ({id,name,price,description,image}) => {
 
     // const [itemCount,setItemCount] = useState(0);
-//for each of the 32 product state not good practice
-//so use context api
+    //for each of the 32 product state not good practice
+    //so use context api
     const {cartItems,addToCart,removeFromCart} = useContext(StoreContext);
     
   return (
