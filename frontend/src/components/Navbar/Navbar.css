@@ -85,10 +85,10 @@ position: relative;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background-color: #fff2ef;
+    background-color: #f2f9f5;
     padding: 12px 25px;
     border-radius: 4px;
-    border: 1px solid rgb(138, 255, 71);
+    border: 1px solid rgb(97, 242, 14);
     outline: 2px solid white;
     list-style: none;
 }

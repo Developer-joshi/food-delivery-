@@ -7,6 +7,7 @@ const StoreContextProvider = (props) => {
 
     const url = "http://localhost:4000"
     const [cartItems,setCartItems] = useState({});
+    const [token,setToken] = useState("");
     const currency = "₹";
     const deliveryCharge = 50;
 
@@ -41,10 +42,11 @@ const StoreContextProvider = (props) => {
         return totalAmount;
     }
 
-
-    // useEffect(() => {
-    //   console.log(cartItems);
-    // }, [cartItems])
+    useEffect(()=>{
+      if(localStorage.getItem("token")){
+        setToken(localStorage.getItem("token"))
+      }
+    },[])
 
     const contextValue = {
         url,
@@ -55,7 +57,9 @@ const StoreContextProvider = (props) => {
         removeFromCart,
         getTotalCartAmount,
         currency,
-        deliveryCharge
+        deliveryCharge,
+        token,
+        setToken
     }
     return(
         <StoreContext.Provider value={contextValue}>
