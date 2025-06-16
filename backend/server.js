@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js";
 import foodRouter from "./routes/foodRoute.js";
 import mongoose from "mongoose";
 import userRouter from "./routes/userRoute.js";
+import cartRouter from "./routes/cartRoute.js";
 import 'dotenv/config.js'
 
  
@@ -25,6 +26,7 @@ import 'dotenv/config.js'
  app.use("/api/food", foodRouter)
  app.use("/images", express.static('uploads'))
  app.use("/api/user",userRouter)
+ app.use("/api/cart",cartRouter)
 
 
  app.get("/", (req, res) => {
