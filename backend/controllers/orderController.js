@@ -1,6 +1,7 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js"
 import Stripe from "stripe";
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 //config variables
@@ -8,6 +9,7 @@ const currency = "inr";
 const deliveryCharge = 50;
 const frontend_URL = 'http://localhost:5173';
 
+//placing user order from frontend
 const placeOrder = async (req, res) => {
 
     try {
@@ -20,6 +22,7 @@ const placeOrder = async (req, res) => {
         await newOrder.save();
         await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
 
+        //create stripe payment link
         const line_items = req.body.items.map((item) => ({
             price_data: {
                 currency: currency,

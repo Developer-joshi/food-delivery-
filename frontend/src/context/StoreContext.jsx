@@ -19,23 +19,22 @@ const StoreContextProvider = (props) => {
       setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
     }
     if (token) {
-      await axios.post(url + "/api/cart/add", { itemId }, { headers: { token } });
+      await axios.post(
+        url + "/api/cart/add",
+        { itemId },
+        { headers: { token } }
+      );
     }
   };
 
   const removeFromCart = async (itemId) => {
-    setCartItems((prev) => {
-      const newCount = (prev[itemId] || 1) - 1;
-      if (newCount <= 0) {
-        // Remove item from cart if count <= 0
-        const { [itemId]: _, ...rest } = prev;
-        return rest;
-      }
-      return { ...prev, [itemId]: newCount };
-    });
-
+    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
     if (token) {
-      await axios.post(url + "/api/cart/remove", { itemId }, { headers: { token } });
+      await axios.post(
+        url + "/api/cart/remove",
+        { itemId },
+        { headers: { token } }
+      );
     }
   };
 
