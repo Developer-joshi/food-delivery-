@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import './Navbar.css';
-import { StoreContext } from '../../Context/StoreContext'; 
+import React, { useContext } from "react";
+import { Link, useLocation } from "react-router-dom";
+import "./Navbar.css";
+import { StoreContext } from "../../context/StoreContext";
 
-const Navbar = () => {
+const Navbar = ({ setShowLogin }) => {
   const { token } = useContext(StoreContext);
   const location = useLocation();
 
@@ -30,9 +30,7 @@ const Navbar = () => {
 
       <div className="navbar-right">
         {!token ? (
-          <Link to="/login">
-            <button>Login</button>
-          </Link>
+          <button onClick={() => setShowLogin(true)}>Login</button>
         ) : (
           <div className="navbar-profile">
             <img src="/profile-icon.png" alt="Profile" width="30" />
@@ -42,10 +40,12 @@ const Navbar = () => {
                 <Link to="/profile">My Profile</Link>
               </li>
               <hr />
-              <li onClick={() => {
-                localStorage.removeItem("token");
-                window.location.reload();
-              }}>
+              <li
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  window.location.reload();
+                }}
+              >
                 <img src="/logout-icon.png" alt="Logout" />
                 Logout
               </li>

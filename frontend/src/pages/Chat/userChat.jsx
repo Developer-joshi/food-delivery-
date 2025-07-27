@@ -2,29 +2,24 @@ import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import socket from "../../socket";
 import "./userChat.css";
-import { StoreContext } from "../../Context/StoreContext";
+import { StoreContext } from "../../context/StoreContext"; // fix the 'Context' case (it was wrong)
 import { jwtDecode } from "jwt-decode";
 
-
-
-const adminId = "admin"; 
+const adminId = "admin";
 
 const UserChat = () => {
-  const { token } = useContext(StoreContext);
+  const { token, url } = useContext(StoreContext); // Get backend URL
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
   const [userId, setUserId] = useState("");
 
-  // Decode token and register user to socket
+  // Decode token & register user to socket
   useEffect(() => {
     if (!token) return;
 
     try {
-        const decoded = jwtDecode(token);
-
-      console.log(decoded);
+      const decoded = jwtDecode(token);
       setUserId(decoded.id);
-
       socket.emit("register", decoded.id);
 
       const handleReceive = (data) => {
@@ -45,7 +40,7 @@ const UserChat = () => {
     if (!userId) return;
 
     axios
-      .get(`/api/chat/messages/${adminId}?currentUserId=${userId}`)
+      .get(`${url}/api/chat/messages/${adminId}?currentUserId=${userId}`) // FIXED URL
       .then((res) => {
         setMessages(res.data.messages || []);
       })
@@ -54,13 +49,9 @@ const UserChat = () => {
         if (err.response) {
           console.log("📦 Response:", err.response.data);
           console.log("📦 Status:", err.response.status);
-        } else if (err.request) {
-          console.log("📡 No response received:", err.request);
-        } else {
-          console.log("⚠️ Error in request setup:", err.message);
         }
       });
-  }, [userId]);
+  }, [userId, url]);
 
   // Send message to admin
   const handleSend = async () => {
@@ -73,7 +64,7 @@ const UserChat = () => {
     };
 
     try {
-      await axios.post("/api/chat/message", msgObj);
+      await axios.post(`${url}/api/chat/message`, msgObj); // FIXED URL
       socket.emit("send_message", msgObj);
       setMessages((prev) => [...prev, msgObj]);
       setNewMsg("");
@@ -82,10 +73,6 @@ const UserChat = () => {
       if (err.response) {
         console.log("📦 Response:", err.response.data);
         console.log("📦 Status:", err.response.status);
-      } else if (err.request) {
-        console.log("📡 No response received:", err.request);
-      } else {
-        console.log("⚠️ Error in request setup:", err.message);
       }
     }
   };
