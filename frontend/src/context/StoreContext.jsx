@@ -48,9 +48,7 @@ const StoreContextProvider = (props) => {
             totalAmount += itemInfo.price * cartItems[item];
           }
         }
-      } catch (error) {
-        // handle error if needed
-      }
+      } catch (error) {}
     }
     return totalAmount;
   };
@@ -61,8 +59,18 @@ const StoreContextProvider = (props) => {
   };
 
   const loadCartData = async (token) => {
-    const response = await axios.post(url + "/api/cart/get", {}, { headers: { token } });
+    const response = await axios.post(
+      url + "/api/cart/get",
+      {},
+      { headers: { token } }
+    );
     setCartItems(response.data.cartData || {});
+  };
+
+  const handleLoginSuccess = async (token) => {
+    localStorage.setItem("token", token);
+    setToken(token);
+    await loadCartData(token); // load cart after login
   };
 
   useEffect(() => {
@@ -70,8 +78,7 @@ const StoreContextProvider = (props) => {
       await fetchFoodList();
       const localToken = localStorage.getItem("token");
       if (localToken) {
-        setToken(localToken);
-        await loadCartData(localToken);
+        await handleLoginSuccess(localToken);
       }
     }
     loadData();
@@ -91,9 +98,14 @@ const StoreContextProvider = (props) => {
     setCartItems,
     currency,
     deliveryCharge,
+    handleLoginSuccess, // expose this so LoginPopup can use it
   };
 
-  return <StoreContext.Provider value={contextValue}>{props.children}</StoreContext.Provider>;
+  return (
+    <StoreContext.Provider value={contextValue}>
+      {props.children}
+    </StoreContext.Provider>
+  );
 };
 
 export default StoreContextProvider;
