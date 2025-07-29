@@ -2,10 +2,13 @@ import { createContext, useEffect, useState } from "react";
 import { menu_list } from "../assets/assets";
 import axios from "axios";
 
+// Create a context for global store
 export const StoreContext = createContext(null);
 
+// Use .env for backend URL (fallback to localhost for dev)
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
 const StoreContextProvider = (props) => {
-  const url = "http://localhost:4000";
   const [food_list, setFoodList] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const [token, setToken] = useState("");
@@ -20,7 +23,7 @@ const StoreContextProvider = (props) => {
     }
     if (token) {
       await axios.post(
-        url + "/api/cart/add",
+        `${API_URL}/api/cart/add`,
         { itemId },
         { headers: { token } }
       );
@@ -31,7 +34,7 @@ const StoreContextProvider = (props) => {
     setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
     if (token) {
       await axios.post(
-        url + "/api/cart/remove",
+        `${API_URL}/api/cart/remove`,
         { itemId },
         { headers: { token } }
       );
@@ -54,13 +57,13 @@ const StoreContextProvider = (props) => {
   };
 
   const fetchFoodList = async () => {
-    const response = await axios.get(url + "/api/food/list");
+    const response = await axios.get(`${API_URL}/api/food/list`);
     setFoodList(response.data.data);
   };
 
   const loadCartData = async (token) => {
     const response = await axios.post(
-      url + "/api/cart/get",
+      `${API_URL}/api/cart/get`,
       {},
       { headers: { token } }
     );
@@ -70,7 +73,7 @@ const StoreContextProvider = (props) => {
   const handleLoginSuccess = async (token) => {
     localStorage.setItem("token", token);
     setToken(token);
-    await loadCartData(token); // load cart after login
+    await loadCartData(token);
   };
 
   useEffect(() => {
@@ -85,7 +88,7 @@ const StoreContextProvider = (props) => {
   }, []);
 
   const contextValue = {
-    url,
+    url: API_URL,
     food_list,
     menu_list,
     cartItems,
@@ -98,7 +101,7 @@ const StoreContextProvider = (props) => {
     setCartItems,
     currency,
     deliveryCharge,
-    handleLoginSuccess, // expose this so LoginPopup can use it
+    handleLoginSuccess,
   };
 
   return (

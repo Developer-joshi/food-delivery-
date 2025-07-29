@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import socket from "../../socket"; // Make sure this path is correct
+import { API_URL, socket } from "../../config";
 import "./ChatGet.css";
 
-const adminId = "admin"; // Hardcoded for admin
+const adminId = "admin";
 
 const Chat = () => {
   const [users, setUsers] = useState([]);
@@ -11,7 +11,6 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
 
-  // Register admin and handle receiving messages
   useEffect(() => {
     socket.emit("register", adminId);
 
@@ -22,43 +21,28 @@ const Chat = () => {
     };
 
     socket.on("receive_message", handleReceive);
-
     return () => {
       socket.off("receive_message", handleReceive);
     };
   }, [selectedUser]);
 
-  // Load all users
   useEffect(() => {
     axios
-      .get("http://localhost:4000/api/user/all")
-      .then((res) => {
-        setUsers(res.data.users || []);
-      })
-      .catch((err) => {
-        console.error("Failed to load users", err);
-      });
+      .get(`${API_URL}/api/user/all`)
+      .then((res) => setUsers(res.data.users || []))
+      .catch((err) => console.error("Failed to load users", err));
   }, []);
 
-  // Load messages for selected user
   const loadMessages = (user) => {
     setSelectedUser(user);
     axios
-      .get(
-        `http://localhost:4000/api/chat/messages/${user._id}?currentUserId=${adminId}`
-      )
-      .then((res) => {
-        setMessages(res.data.messages || []);
-      })
-      .catch((err) => {
-        console.error("Failed to load messages", err);
-      });
+      .get(`${API_URL}/api/chat/messages/${user._id}?currentUserId=${adminId}`)
+      .then((res) => setMessages(res.data.messages || []))
+      .catch((err) => console.error("Failed to load messages", err));
   };
 
-  // Send message
   const handleSend = async () => {
     if (!newMsg.trim() || !selectedUser) return;
-
     const msgObj = {
       senderId: adminId,
       receiverId: selectedUser._id,
@@ -66,7 +50,7 @@ const Chat = () => {
     };
 
     try {
-      await axios.post("http://localhost:4000/api/chat/message", msgObj);
+      await axios.post(`${API_URL}/api/chat/message`, msgObj);
       socket.emit("send_message", msgObj);
       setMessages((prev) => [...prev, msgObj]);
       setNewMsg("");
@@ -91,7 +75,9 @@ const Chat = () => {
               }`}
               onClick={() => loadMessages(user)}
             >
-              <p><strong>{user.name}</strong></p>
+              <p>
+                <strong>{user.name}</strong>
+              </p>
               <p className="last-msg">{user.email}</p>
             </div>
           ))
