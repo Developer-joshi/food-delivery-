@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { API_URL, socket } from "../../config";
-import "./ChatGet.css";
+import socket from "../../socket"; 
 
+import "./ChatGet.css";
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 const adminId = "admin";
 
 const Chat = () => {

@@ -2,10 +2,9 @@ import { createContext, useEffect, useState } from "react";
 import { menu_list } from "../assets/assets";
 import axios from "axios";
 
-// Create a context for global store
 export const StoreContext = createContext(null);
 
-// Use .env for backend URL (fallback to localhost for dev)
+// Single backend URL (from .env)
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
 const StoreContextProvider = (props) => {
@@ -16,11 +15,10 @@ const StoreContextProvider = (props) => {
   const deliveryCharge = 50;
 
   const addToCart = async (itemId) => {
-    if (!cartItems[itemId]) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-    }
+    setCartItems((prev) => ({
+      ...prev,
+      [itemId]: (prev[itemId] || 0) + 1,
+    }));
     if (token) {
       await axios.post(
         `${API_URL}/api/cart/add`,
@@ -31,7 +29,10 @@ const StoreContextProvider = (props) => {
   };
 
   const removeFromCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+    setCartItems((prev) => ({
+      ...prev,
+      [itemId]: prev[itemId] - 1,
+    }));
     if (token) {
       await axios.post(
         `${API_URL}/api/cart/remove`,
@@ -42,32 +43,24 @@ const StoreContextProvider = (props) => {
   };
 
   const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const item in cartItems) {
-      try {
-        if (cartItems[item] > 0) {
-          let itemInfo = food_list.find((product) => product._id === item);
-          if (itemInfo) {
-            totalAmount += itemInfo.price * cartItems[item];
-          }
-        }
-      } catch (error) {}
-    }
-    return totalAmount;
+    return Object.entries(cartItems).reduce((total, [id, qty]) => {
+      const item = food_list.find((p) => p._id === id);
+      return item ? total + item.price * qty : total;
+    }, 0);
   };
 
   const fetchFoodList = async () => {
-    const response = await axios.get(`${API_URL}/api/food/list`);
-    setFoodList(response.data.data);
+    const res = await axios.get(`${API_URL}/api/food/list`);
+    setFoodList(res.data.data);
   };
 
   const loadCartData = async (token) => {
-    const response = await axios.post(
+    const res = await axios.post(
       `${API_URL}/api/cart/get`,
       {},
       { headers: { token } }
     );
-    setCartItems(response.data.cartData || {});
+    setCartItems(res.data.cartData || {});
   };
 
   const handleLoginSuccess = async (token) => {
@@ -77,35 +70,32 @@ const StoreContextProvider = (props) => {
   };
 
   useEffect(() => {
-    async function loadData() {
+    (async () => {
       await fetchFoodList();
-      const localToken = localStorage.getItem("token");
-      if (localToken) {
-        await handleLoginSuccess(localToken);
-      }
-    }
-    loadData();
+      const savedToken = localStorage.getItem("token");
+      if (savedToken) await handleLoginSuccess(savedToken);
+    })();
   }, []);
 
-  const contextValue = {
-    url: API_URL,
-    food_list,
-    menu_list,
-    cartItems,
-    addToCart,
-    removeFromCart,
-    getTotalCartAmount,
-    token,
-    setToken,
-    loadCartData,
-    setCartItems,
-    currency,
-    deliveryCharge,
-    handleLoginSuccess,
-  };
-
   return (
-    <StoreContext.Provider value={contextValue}>
+    <StoreContext.Provider
+      value={{
+        url: API_URL,
+        food_list,
+        menu_list,
+        cartItems,
+        addToCart,
+        removeFromCart,
+        getTotalCartAmount,
+        token,
+        setToken,
+        loadCartData,
+        setCartItems,
+        currency,
+        deliveryCharge,
+        handleLoginSuccess,
+      }}
+    >
       {props.children}
     </StoreContext.Provider>
   );

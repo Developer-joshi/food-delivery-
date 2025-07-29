@@ -1,12 +1,10 @@
-// src/socket.js
 import { io } from "socket.io-client";
 
-// Use backend URL from environment variables (Vite)
-const API_URL = import.meta.env.VITE_BACKEND_URL;
+// Use the same backend URL as StoreContext
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
-// Create socket connection
 const socket = io(API_URL, {
-  transports: ["websocket"], // helps avoid polling fallback
+  transports: ["websocket"],
 });
 
 export default socket;
