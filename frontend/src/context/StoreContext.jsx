@@ -5,7 +5,7 @@ import axios from "axios";
 export const StoreContext = createContext(null);
 
 // Single backend URL (from .env)
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const StoreContextProvider = (props) => {
   const [food_list, setFoodList] = useState([]);
@@ -13,6 +13,7 @@ const StoreContextProvider = (props) => {
   const [token, setToken] = useState("");
   const currency = "₹";
   const deliveryCharge = 50;
+console.log("Using socket URL:", API_URL);
 
   const addToCart = async (itemId) => {
     setCartItems((prev) => ({

@@ -10,6 +10,7 @@ import Verify from './pages/Verify/Verify'
 import Footer from './components/Footer/Footer'
 import MyOrders from './pages/MyOrders/MyOrders'
 import UserChat from './pages/Chat/userChat'
+import ReviewPage from "./pages/Reviews/Reviews";
 import { StoreContext } from './context/StoreContext'
 const App = () => {
   const { token } = useContext(StoreContext);
@@ -26,6 +27,7 @@ const App = () => {
           <Route path="/order" element={<PlaceOrder />} />
           <Route path="/verify" element={<Verify />} />
           <Route path="/myorders" element={<MyOrders />} />
+          <Route path="/reviews/:foodId" element={<ReviewPage />} />          
           {token && <Route path="/chat" element={<UserChat />} />}
         </Routes>
       </div>
