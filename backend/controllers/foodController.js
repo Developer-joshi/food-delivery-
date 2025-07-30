@@ -68,7 +68,7 @@ const removeFood = async (req, res) => {
     }
 
 }
-export const getReviews = async (req, res) => {
+const getReviews = async (req, res) => {
   try {
     const food = await foodModel.findById(req.params.foodId);
     if (!food)
@@ -83,7 +83,7 @@ export const getReviews = async (req, res) => {
 };
 
 // POST /api/reviews/:foodId
-export const addReview = async (req, res) => {
+const addReview = async (req, res) => {
   try {
     const food = await foodModel.findById(req.params.foodId);
     if (!food)
