@@ -26,18 +26,30 @@ const addFood = async (req, res) => {
   }
 };
 
-//list all food function
 const listFood = async (req, res) => {
-    try {
-        const foods = await foodModel.find({})
-        res.json({ success: true, data: foods })
-    } 
-    catch (error) {
-        console.log(error);
-        res.json({ success: false, message: "Error" })
-    }
+  try {
+    const foods = await foodModel.find({});
 
-}
+    const foodsWithRatings = foods.map((food) => {
+      const reviews = food.reviews || [];
+      const averageRating = reviews.length
+        ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+        : 0;
+
+      return {
+        ...food._doc,
+        averageRating: Number(averageRating.toFixed(1)), // limit to 1 decimal
+        reviewCount: reviews.length,
+      };
+    });
+
+    res.json({ success: true, data: foodsWithRatings });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Error" });
+  }
+};
+
 
 // delete food
 const removeFood = async (req, res) => {
@@ -56,56 +68,55 @@ const removeFood = async (req, res) => {
     }
 
 }
-// Add a review to a food item
-const addReview = async (req, res) => {
-  try {
-    const { rating, comment } = req.body;
-    const foodId = req.params.foodId;
-    const userId = req.user._id;
-    const username = req.user.name;
-
-    const food = await foodModel.findById(foodId);
-    if (!food) return res.status(404).json({ success: false, message: "Food not found" });
-
-    food.reviews.push({ userId, username, rating, comment });
-
-    // Recalculate average rating
-    const totalRating = food.reviews.reduce((acc, r) => acc + r.rating, 0);
-    food.averageRating = totalRating / food.reviews.length;
-
-    await food.save();
-
-    const newReview = food.reviews[food.reviews.length - 1]; // the one just pushed
-
-    res.json({
-      success: true,
-      message: "Review added",
-      averageRating: food.averageRating,
-      review: newReview,
-    });
-
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-};
-const getReviews = async (req, res) => {
+export const getReviews = async (req, res) => {
   try {
     const food = await foodModel.findById(req.params.foodId);
-
     if (!food)
       return res
         .status(404)
-        .json({ success: false, message: "Food not found" });
+        .json({ success: false, message: "Food item not found" });
 
-    res.json({
-      success: true,
-      reviews: food.reviews,
-      averageRating: food.averageRating,
-    });
+    res.json({ success: true, food }); // include whole food
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ success: false, message: "Error fetching reviews" });
+  }
+};
+
+// POST /api/reviews/:foodId
+export const addReview = async (req, res) => {
+  try {
+    const food = await foodModel.findById(req.params.foodId);
+    if (!food)
+      return res
+        .status(404)
+        .json({ success: false, message: "Food item not found" });
+
+    const { rating, comment } = req.body;
+
+    const alreadyReviewed = food.reviews.find(
+      (r) => r.userId.toString() === req.user.id
+    );
+    if (alreadyReviewed)
+      return res
+        .status(400)
+        .json({ success: false, message: "Already reviewed" });
+
+    const review = {
+      userId: req.user.id,
+      username: req.user.name,
+      rating,
+      comment,
+    };
+
+    food.reviews.push(review);
+    food.averageRating =
+      food.reviews.reduce((sum, r) => sum + r.rating, 0) / food.reviews.length;
+
+    await food.save();
+
+    res.status(201).json({ success: true, message: "Review added" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error adding review" });
   }
 };
 

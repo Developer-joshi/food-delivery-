@@ -1,112 +1,85 @@
-import React, { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { StoreContext } from "../../context/StoreContext"; // adjust if path differs
+import { useParams } from "react-router-dom";
+import "./ReviewPage.css";
+import { StoreContext } from "../../context/StoreContext";
 
 const ReviewPage = () => {
   const { foodId } = useParams();
-  const { url, token } = useContext(StoreContext);
+  const { token, url } = useContext(StoreContext);
+  const [food, setFood] = useState(null);
+  const [userRating, setUserRating] = useState(0);
+  const [userComment, setUserComment] = useState("");
+  const [message, setMessage] = useState("");
 
-  const [reviews, setReviews] = useState([]);
-  const [foodDetails, setFoodDetails] = useState({});
-  const [averageRating, setAverageRating] = useState(0);
-    const [rating, setRating] = useState("");
-    const [comment, setComment] = useState("");
-    const [submitMessage, setSubmitMessage] = useState("");
+  const getFoodReviews = async () => {
+    try {
+      const res = await axios.get(`${url}/api/reviews/${foodId}`);
+      if (res.data.success) setFood(res.data.food);
+    } catch (err) {
+      console.error("Error fetching reviews", err);
+    }
+  };
 
+  const handleReviewSubmit = async () => {
+    try {
+      const res = await axios.post(
+        `${url}/api/reviews/${foodId}`,
+        { rating: userRating, comment: userComment },
+        { headers: { token } }
+      );
+      setMessage(res.data.message);
+      setUserRating(0);
+      setUserComment("");
+      getFoodReviews();
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Error");
+    }
+  };
 
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const res = await axios.get(`${url}/api/food/reviews/${foodId}`);
-        setReviews(res.data.reviews);
-        setAverageRating(res.data.averageRating);
-        setFoodDetails(res.data.food); // if sent from backend
-      } catch (err) {
-        console.error("Error fetching reviews", err);
-      }
-    };
-    fetchReviews();
-  }, [foodId]);
-const handleSubmitReview = async () => {
-  if (!rating || !comment) {
-    setSubmitMessage("Please provide both rating and comment.");
-    return;
-  }
+    getFoodReviews();
+  }, []);
 
-  try {
-    const res = await axios.post(
-      `${url}/api/food/review/${foodId}`,
-      { rating, comment },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (res.data.success) {
-      setSubmitMessage("Review submitted successfully!");
-      setReviews([...reviews, res.data.review]);
-      setRating("");
-      setComment("");
-    } else {
-      setSubmitMessage(res.data.message || "Something went wrong.");
-    }
-  } catch (err) {
-    setSubmitMessage(err.response?.data?.message || "Error submitting review.");
-  }
-};
+  if (!food) return <p>Loading...</p>;
 
   return (
     <div className="review-page">
-      <h2>{foodDetails.name}</h2>
-      <p>{foodDetails.description}</p>
+      <h2>{food.name}</h2>
+      <p>{food.description}</p>
+      <h3>Average Rating: {food.averageRating?.toFixed(1)} ⭐</h3>
+      <h4>{food.reviews.length} Review(s)</h4>
 
-      <h3>Average Rating: {averageRating?.toFixed(1)} ⭐</h3>
-      <p>{reviews.length} Reviews</p>
+      <div className="add-review">
+        <label>Rating: </label>
+        <select
+          value={userRating}
+          onChange={(e) => setUserRating(+e.target.value)}
+        >
+          <option value={0}>Select</option>
+          {[1, 2, 3, 4, 5].map((s) => (
+            <option key={s} value={s}>
+              {s} Star
+            </option>
+          ))}
+        </select>
+        <textarea
+          placeholder="Write your review..."
+          value={userComment}
+          onChange={(e) => setUserComment(e.target.value)}
+        />
+        <button onClick={handleReviewSubmit}>Submit</button>
+        {message && <p>{message}</p>}
+      </div>
 
-      <div className="review-list">
-        {reviews.map((r) => (
-          <div key={r._id} className="single-review">
-            <p>
-              ⭐ {r.rating} — {r.comment}
-            </p>
-            <p style={{ fontSize: "12px", color: "gray" }}>
-              {r.isVerified && "✔ Verified Purchase"}
-            </p>
+      <div className="all-reviews">
+        {food.reviews.map((r, idx) => (
+          <div key={idx} className="single-review">
+            <strong>{r.username}</strong> ({r.rating}⭐)
+            <p>{r.comment}</p>
           </div>
         ))}
       </div>
-
-      {token && (
-        <div className="add-review">
-          <h3>Add Your Review</h3>
-          {/* we’ll add form inputs next */}
-          <div className="review-form">
-            <label>Rating (1–5):</label>
-            <select value={rating} onChange={(e) => setRating(e.target.value)}>
-              <option value="">Select</option>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <option key={star} value={star}>
-                  {star}
-                </option>
-              ))}
-            </select>
-
-            <label>Comment:</label>
-            <textarea
-              rows="4"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Write your review here..."
-            />
-
-            <button onClick={handleSubmitReview}>Submit Review</button>
-            {submitMessage && <p style={{ color: "green" }}>{submitMessage}</p>}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

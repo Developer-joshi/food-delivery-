@@ -1,16 +1,18 @@
 import jwt from "jsonwebtoken";
+const jwtSecret = process.env.JWT_SECRET;
 
 const authMiddleware = async (req, res, next) => {
-  const { token } = req.headers;
-  if (!token) {
-    return res.json({ success: false, message: "Not Authorized Login Again" });
-  }
   try {
-    const token_decode = jwt.verify(token, process.env.JWT_SECRET);
-    req.body.userId = token_decode.id;
+    const token = req.headers.token;
+    if (!token)
+      return res.status(401).json({ success: false, message: "Token missing" });
+
+    const decoded = jwt.verify(token, jwtSecret);
+    req.user = { id: decoded.id, name: decoded.name }; // Set from token payload
+
     next();
-  } catch (error) {
-    return res.json({ success: false, message: error.message });
+  } catch (err) {
+    res.status(401).json({ success: false, message: "Unauthorized" });
   }
 };
 

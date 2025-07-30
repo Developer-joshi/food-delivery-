@@ -3,13 +3,21 @@ import './FoodItem.css'
 import { assets } from '../../assets/assets';
 import { StoreContext } from '../../context/StoreContext';
 import { Link } from "react-router-dom";
-const FoodItem = ({id,name,price,description,image}) => {
+const FoodItem = ({
+  id,
+  name,
+  price,
+  description,
+  image,
+  averageRating,
+  reviewCount,
+}) => {
+  // const [itemCount,setItemCount] = useState(0);
+  //for each of the 32 product state not good practice
+  //so use context api
+  const { cartItems, addToCart, removeFromCart, url } =
+    useContext(StoreContext);
 
-    // const [itemCount,setItemCount] = useState(0);
-    //for each of the 32 product state not good practice
-    //so use context api
-    const {cartItems,addToCart,removeFromCart,url} = useContext(StoreContext);
-    
   return (
     <div className="food-item">
       <div className="food-item-img-container">
@@ -46,7 +54,9 @@ const FoodItem = ({id,name,price,description,image}) => {
           <p>{name}</p>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
             <p style={{ fontWeight: "bold" }}>
-              {averageRating?.toFixed(1) || "0.0"}
+              {typeof averageRating === "number"
+                ? averageRating.toFixed(1)
+                : "0.0"}
             </p>
             <img
               src={assets.star_filled_icon}
@@ -54,7 +64,7 @@ const FoodItem = ({id,name,price,description,image}) => {
               style={{ width: "16px" }}
             />
             <p style={{ color: "gray", fontSize: "14px" }}>
-              {reviews?.length || 0} Reviews
+              {reviewCount || 0} Reviews
             </p>
           </div>
         </div>
@@ -67,6 +77,6 @@ const FoodItem = ({id,name,price,description,image}) => {
       </div>
     </div>
   );
-}
+};
 
 export default FoodItem
