@@ -10,8 +10,9 @@ import Verify from './pages/Verify/Verify'
 import Footer from './components/Footer/Footer'
 import MyOrders from './pages/MyOrders/MyOrders'
 import UserChat from './pages/Chat/userChat'
-import ReviewPage from "./pages/Reviews/Reviews";
+// import ReviewPage from "./pages/Reviews/ReviewPage";
 import { StoreContext } from './context/StoreContext'
+import { ToastContainer } from "react-toastify";
 const App = () => {
   const { token } = useContext(StoreContext);
     const [showLogin,setShowLogin] = useState(false);
@@ -27,9 +28,10 @@ const App = () => {
           <Route path="/order" element={<PlaceOrder />} />
           <Route path="/verify" element={<Verify />} />
           <Route path="/myorders" element={<MyOrders />} />
-          <Route path="/reviews/:foodId" element={<ReviewPage />} />          
+          {/* <Route path="/reviews/:foodId" element={<ReviewPage />} /> */}
           {token && <Route path="/chat" element={<UserChat />} />}
         </Routes>
+        <ToastContainer />
       </div>
       <Footer />
     </>

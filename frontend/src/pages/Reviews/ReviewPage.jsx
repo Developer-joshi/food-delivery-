@@ -14,28 +14,40 @@ const ReviewPage = () => {
 
   const getFoodReviews = async () => {
     try {
-      const res = await axios.get(`${url}/api/reviews/${foodId}`);
+    const res = await axios.get(`${url}/api/food/reviews/${foodId}`);
+
       if (res.data.success) setFood(res.data.food);
     } catch (err) {
       console.error("Error fetching reviews", err);
     }
   };
 
-  const handleReviewSubmit = async () => {
-    try {
-      const res = await axios.post(
-        `${url}/api/reviews/${foodId}`,
-        { rating: userRating, comment: userComment },
-        { headers: { token } }
-      );
-      setMessage(res.data.message);
-      setUserRating(0);
-      setUserComment("");
-      getFoodReviews();
-    } catch (err) {
-      setMessage(err.response?.data?.message || "Error");
-    }
-  };
+const handleReviewSubmit = async () => {
+  if (!token) {
+    setMessage("You must be logged in to submit a review.");
+    return;
+  }
+
+  try {
+    const res = await axios.post(
+      `${url}/api/food/review/${foodId}`,
+      { rating: userRating, comment: userComment },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    setMessage(res.data.message);
+    setUserRating(0);
+    setUserComment("");
+    getFoodReviews();
+  } catch (err) {
+    setMessage(err.response?.data?.message || "Error submitting review");
+  }
+};
+
+
 
   useEffect(() => {
     getFoodReviews();
@@ -68,7 +80,10 @@ const ReviewPage = () => {
           value={userComment}
           onChange={(e) => setUserComment(e.target.value)}
         />
-        <button onClick={handleReviewSubmit}>Submit</button>
+        <button onClick={handleReviewSubmit} disabled={!token || !userRating}>
+          Submit
+        </button>
+
         {message && <p>{message}</p>}
       </div>
 

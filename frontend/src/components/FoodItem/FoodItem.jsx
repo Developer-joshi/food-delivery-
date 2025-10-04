@@ -9,8 +9,8 @@ const FoodItem = ({
   price,
   description,
   image,
-  averageRating,
-  reviewCount,
+  // averageRating,
+  // reviewCount,
 }) => {
   // const [itemCount,setItemCount] = useState(0);
   //for each of the 32 product state not good practice
@@ -53,25 +53,25 @@ const FoodItem = ({
         <div className="food-item-name-rating">
           <p>{name}</p>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <p style={{ fontWeight: "bold" }}>
-              {typeof averageRating === "number"
+            {/* <p style={{ fontWeight: "bold" }}> */}
+              {/* {typeof averageRating === "number"
                 ? averageRating.toFixed(1)
                 : "0.0"}
-            </p>
+            </p> */}
             <img
               src={assets.star_filled_icon}
               alt="star"
               style={{ width: "16px" }}
             />
-            <p style={{ color: "gray", fontSize: "14px" }}>
+            {/* <p style={{ color: "gray", fontSize: "14px" }}>
               {reviewCount || 0} Reviews
-            </p>
+            </p> */}
           </div>
         </div>
         {/* Add/View Review Button */}
-        <Link to={`/reviews/${id}`}>
+        {/* <Link to={`/reviews/${id}`}>
           <button className="review-btn">Add/View Reviews</button>
-        </Link>
+        </Link> */}
         <p className="food-item-desc">{description}</p>
         <p className="food-item-price">₹{price}</p>
       </div>

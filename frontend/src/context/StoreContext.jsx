@@ -4,7 +4,6 @@ import axios from "axios";
 
 export const StoreContext = createContext(null);
 
-// Single backend URL (from .env)
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const StoreContextProvider = (props) => {
@@ -13,18 +12,25 @@ const StoreContextProvider = (props) => {
   const [token, setToken] = useState("");
   const currency = "₹";
   const deliveryCharge = 50;
-console.log("Using socket URL:", API_URL);
+
+  console.log("Using socket URL:", API_URL);
+  console.log("Token being sent =>", token);
 
   const addToCart = async (itemId) => {
     setCartItems((prev) => ({
       ...prev,
       [itemId]: (prev[itemId] || 0) + 1,
     }));
+
     if (token) {
       await axios.post(
         `${API_URL}/api/cart/add`,
         { itemId },
-        { headers: { token } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ fixed
+          },
+        }
       );
     }
   };
@@ -34,11 +40,16 @@ console.log("Using socket URL:", API_URL);
       ...prev,
       [itemId]: prev[itemId] - 1,
     }));
+
     if (token) {
       await axios.post(
         `${API_URL}/api/cart/remove`,
         { itemId },
-        { headers: { token } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ fixed
+          },
+        }
       );
     }
   };
@@ -59,7 +70,11 @@ console.log("Using socket URL:", API_URL);
     const res = await axios.post(
       `${API_URL}/api/cart/get`,
       {},
-      { headers: { token } }
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ fixed
+        },
+      }
     );
     setCartItems(res.data.cartData || {});
   };
