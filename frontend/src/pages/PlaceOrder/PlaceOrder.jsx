@@ -56,7 +56,8 @@ const PlaceOrder = () => {
     };
     if (payment === "stripe") {
       let response = await axios.post(url + "/api/order/place", orderData, {
-        headers: { token },
+        // headers: { token },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.success) {
         const { session_url } = response.data;
@@ -65,8 +66,9 @@ const PlaceOrder = () => {
         toast.error("Something Went Wrong");
       }
     } else {
-      let response = await axios.post(url + "/api/order/placecod", orderData, {
-        headers: { token },
+      let response = await axios.post(url + "/api/order/place", orderData, {
+        // headers: { token },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.success) {
         navigate("/myorders");

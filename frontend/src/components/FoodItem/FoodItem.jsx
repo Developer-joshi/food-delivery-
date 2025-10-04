@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import './FoodItem.css'
-import { assets } from '../../assets/assets';
+import { assets } from '../../assets/assets.js';
 import { StoreContext } from '../../context/StoreContext';
 import { Link } from "react-router-dom";
 const FoodItem = ({
@@ -54,12 +54,13 @@ const FoodItem = ({
           <p>{name}</p>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
             {/* <p style={{ fontWeight: "bold" }}> */}
-              {/* {typeof averageRating === "number"
+            {/* {typeof averageRating === "number"
                 ? averageRating.toFixed(1)
                 : "0.0"}
             </p> */}
             <img
-              src={assets.star_filled_icon}
+              // src={assets.star_filled_icon}
+              src="/rating_starts.png"
               alt="star"
               style={{ width: "16px" }}
             />

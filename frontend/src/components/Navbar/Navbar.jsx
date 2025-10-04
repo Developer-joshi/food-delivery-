@@ -33,10 +33,10 @@ const Navbar = ({ setShowLogin }) => {
           <button onClick={() => setShowLogin(true)}>Login</button>
         ) : (
           <div className="navbar-profile">
-            <img src="/profile-icon.png" alt="Profile" width="30" />
+            <img src="/profile_icon.png" alt="Profile" width="30" />
             <div className="navbar-profile-dropdown">
               <li>
-                <img src="/profile-icon.png" alt="Profile" />
+                <img src="/profile_icon.png" alt="Profile" />
                 <Link to="/profile">My Profile</Link>
               </li>
               <hr />
@@ -46,7 +46,7 @@ const Navbar = ({ setShowLogin }) => {
                   window.location.reload();
                 }}
               >
-                <img src="/logout-icon.png" alt="Logout" />
+                <img src="/logout_icon.png" alt="Logout" />
                 Logout
               </li>
             </div>

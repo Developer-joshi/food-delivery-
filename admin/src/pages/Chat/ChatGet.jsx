@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import socket from "../../socket"; 
+import socket from "../../../../frontend/src/socket.js"; 
 
 import "./ChatGet.css";
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
